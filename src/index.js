@@ -1,11 +1,13 @@
 import "./styles.css";
-require("jquery");
-const axios = require("axios");
+const $ = require("jquery");
 const flatpickr = require("flatpickr");
 
-const BASE_URL = "https://5bc31c65-b2f0-447b-b9c0-fca929b0b8f6.mock.pstmn.io";
+//const BASE_URL = "https://5bc31c65-b2f0-447b-b9c0-fca929b0b8f6.mock.pstmn.io";
+//const ENDPOINT = "/api/Schedule/GetAvailableTimeslots";
+//const key = "PMAK-5dc2ebf7fbc621002a375da5-77e646bf0a98abcf6e195cc47b38109953";
+
+const BASE_URL = "https://epiccnx.deaconess.com";
 const ENDPOINT = "/api/Schedule/GetAvailableTimeslots";
-const key = "PMAK-5dc2ebf7fbc621002a375da5-77e646bf0a98abcf6e195cc47b38109953";
 
 document.getElementById("app").innerHTML = `
 <h1>Deaconess - Schedule Now</h1>
@@ -120,20 +122,36 @@ flatpickr("#flatpickr", {
   noCalendar: false,
 
   onChange: function(selectedDates, dateStr, instance) {
-    console.log("Calendar Change");
+    getAllAvailability("08332", "321011");
   }
 });
 
-export async function getAllAvailability(providerID, visitType) {
-  const request = {
-    method: "post",
+function getAllAvailability(providerID, visitType) {
+  var request = $.ajax({
+    method: "POST",
     url: BASE_URL + ENDPOINT,
-    headers: { "x-api-key": key },
     data: {
       ProviderID: providerID,
-      VisitType: visitType
+      VisitType: visitType,
+      DepartmentID: "3033174191",
+      StartDate: "2019-01-01",
+      EndDate: "2020-12-18"
+    },
+    beforeSend: function(xhr, request) {
+      //console.log(request);
     }
-  };
-  const response = await axios(request);
-  if (response.status === 200) return response.data;
+  });
+
+  request.fail(function(xhr, status, error) {
+    //alert("Request failed: " + error);
+    //console.log(xhr);
+  });
+
+  request.success(function(result, status, xhr) {
+    alert("Request Success: " + status);
+    //console.log(result);
+  });
 }
+
+//contentType: "json",
+//dataType: "json",
